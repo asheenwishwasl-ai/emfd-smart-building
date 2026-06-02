@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
@@ -500,12 +501,13 @@ void sendToServer()
     String json;
     serializeJson(doc, json);
 
-    WiFiClient client;
+    WiFiClientSecure client;
+    client.setInsecure();   // Skip SSL cert check — fine for ESP32 → Vercel
     HTTPClient http;
 
     http.begin(client, SERVER_URL);
-    http.setConnectTimeout(1500);
-    http.setTimeout(1500);
+    http.setConnectTimeout(5000);
+    http.setTimeout(5000);
     http.addHeader("Content-Type", "application/json");
     http.addHeader("x-device-id", DEVICE_ID);
     http.addHeader("x-api-key",   API_KEY);
